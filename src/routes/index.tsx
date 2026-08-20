@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { FileStack, Loader2, RefreshCw } from "lucide-react";
+import { CalendarClock, FileStack, Loader2, PanelLeft, RefreshCw, ShieldAlert } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 
@@ -11,35 +11,40 @@ import { Markdown } from "@/components/app/Markdown";
 import { ReportPanel } from "@/components/app/ReportPanel";
 import type { ChatTurn, WorkDoc } from "@/components/app/types";
 import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { askDocuments, extractInsights, generateReport } from "@/lib/documents.functions";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Workdesk — AI document Q&A and report writing" },
+      { title: "Meetings Ahead — AI meeting briefings & reports" },
       {
         name: "description",
         content:
-          "Turn meeting notes, specs and transcripts into grounded answers, briefings and ready-to-send workplace reports.",
+          "Turn meeting notes and transcripts into grounded answers, briefings and ready-to-send workplace reports with AI.",
       },
-      { property: "og:title", content: "Workdesk — AI document Q&A and report writing" },
+      { property: "og:title", content: "Meetings Ahead — AI meeting briefings & reports" },
       {
         property: "og:description",
         content:
-          "Ask questions across your work documents and auto-draft status reports, recaps and executive briefs.",
+          "Ask questions across your meeting notes and auto-draft status reports, recaps and executive briefs.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: Index,
 });
 
-const STORAGE_KEY = "workdesk.docs.v1";
+const STORAGE_KEY = "meetings-ahead.docs.v1";
 
 function Index() {
   const [docs, setDocs] = useState<WorkDoc[]>([]);
   const [selected, setSelected] = useState<string[]>([]);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [view, setView] = useState("brief");
+  const [navOpen, setNavOpen] = useState(false);
   const [turns, setTurns] = useState<ChatTurn[]>([]);
   const [insights, setInsights] = useState("");
   const [report, setReport] = useState("");
@@ -132,31 +137,60 @@ function Index() {
     }
   };
 
-  return (
-    <main className="min-h-screen p-4 lg:p-6">
-      <div className="mx-auto flex max-w-[1400px] flex-col gap-5 lg:h-[calc(100vh-3rem)] lg:flex-row">
-        <DocumentSidebar
-          docs={docs}
-          selected={selected}
-          onNew={() => setDialogOpen(true)}
-          onUpload={handleUpload}
-          onToggle={(id) =>
-            setSelected((s) => (s.includes(id) ? s.filter((x) => x !== id) : [...s, id]))
-          }
-          onRemove={(id) => {
-            setDocs((d) => d.filter((x) => x.id !== id));
-            setSelected((s) => s.filter((x) => x !== id));
-          }}
-        />
+  const sidebar = (
+    <DocumentSidebar
+      docs={docs}
+      selected={selected}
+      view={view}
+      onViewChange={(v) => {
+        setView(v);
+        setNavOpen(false);
+      }}
+      onNew={() => setDialogOpen(true)}
+      onUpload={handleUpload}
+      onToggle={(id) =>
+        setSelected((s) => (s.includes(id) ? s.filter((x) => x !== id) : [...s, id]))
+      }
+      onRemove={(id) => {
+        setDocs((d) => d.filter((x) => x.id !== id));
+        setSelected((s) => s.filter((x) => x !== id));
+      }}
+    />
+  );
 
-        <section className="panel flex min-h-0 flex-1 flex-col p-6">
+  return (
+    <main className="min-h-screen p-3 sm:p-4 lg:p-6">
+      <div className="mx-auto flex max-w-[1400px] flex-col gap-4 lg:h-[calc(100vh-3rem)] lg:flex-row lg:gap-5">
+        <header className="flex items-center justify-between gap-3 lg:hidden">
+          <div className="flex items-center gap-2">
+            <span className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+              <CalendarClock className="size-4" />
+            </span>
+            <span className="font-display text-base font-semibold">Meetings Ahead</span>
+          </div>
+          <Sheet open={navOpen} onOpenChange={setNavOpen}>
+            <SheetTrigger asChild>
+              <Button variant="outline" size="sm">
+                <PanelLeft /> Menu
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="left" className="w-[86vw] max-w-sm border-none bg-transparent p-2">
+              <SheetTitle className="sr-only">Navigation</SheetTitle>
+              {sidebar}
+            </SheetContent>
+          </Sheet>
+        </header>
+
+        <div className="hidden lg:flex">{sidebar}</div>
+
+        <section className="panel flex min-h-0 flex-1 flex-col p-4 sm:p-6">
           <header className="flex flex-wrap items-end justify-between gap-3 pb-5">
             <div>
-              <h2 className="text-2xl font-semibold">Workspace</h2>
+              <h2 className="font-display text-xl font-semibold sm:text-2xl">Meeting workspace</h2>
               <p className="mt-1 text-sm text-muted-foreground">
                 {noContext
-                  ? "Select at least one document to start."
-                  : `${activeDocs.length} document${activeDocs.length > 1 ? "s" : ""} in context`}
+                  ? "Add or select at least one meeting source to start."
+                  : `${activeDocs.length} source${activeDocs.length > 1 ? "s" : ""} in context`}
               </p>
             </div>
             <span className="flex items-center gap-2 rounded-full bg-secondary px-3 py-1.5 text-xs font-medium text-secondary-foreground">
@@ -164,7 +198,7 @@ function Index() {
             </span>
           </header>
 
-          <Tabs defaultValue="brief" className="flex min-h-0 flex-1 flex-col">
+          <Tabs value={view} onValueChange={setView} className="flex min-h-0 flex-1 flex-col">
             <TabsList className="w-full justify-start">
               <TabsTrigger value="brief">Briefing</TabsTrigger>
               <TabsTrigger value="ask">Ask</TabsTrigger>
@@ -216,6 +250,16 @@ function Index() {
               />
             </TabsContent>
           </Tabs>
+
+          <p className="mt-4 flex items-start gap-2 border-t pt-3 text-xs leading-relaxed text-muted-foreground">
+            <ShieldAlert className="mt-0.5 size-3.5 shrink-0" />
+            <span>
+              Responsible AI: responses are generated by AI from the sources you select and can be
+              incomplete or wrong. Review and verify before sharing decisions, commitments or
+              anything sent externally. Avoid uploading personal or confidential data you are not
+              permitted to process.
+            </span>
+          </p>
         </section>
       </div>
 

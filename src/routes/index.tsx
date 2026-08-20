@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { FileStack, Loader2, RefreshCw } from "lucide-react";
+import { CalendarClock, FileStack, Loader2, PanelLeft, RefreshCw, ShieldAlert } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 
@@ -11,35 +11,40 @@ import { Markdown } from "@/components/app/Markdown";
 import { ReportPanel } from "@/components/app/ReportPanel";
 import type { ChatTurn, WorkDoc } from "@/components/app/types";
 import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { askDocuments, extractInsights, generateReport } from "@/lib/documents.functions";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Workdesk — AI document Q&A and report writing" },
+      { title: "Meetings Ahead — AI meeting briefings & reports" },
       {
         name: "description",
         content:
-          "Turn meeting notes, specs and transcripts into grounded answers, briefings and ready-to-send workplace reports.",
+          "Turn meeting notes and transcripts into grounded answers, briefings and ready-to-send workplace reports with AI.",
       },
-      { property: "og:title", content: "Workdesk — AI document Q&A and report writing" },
+      { property: "og:title", content: "Meetings Ahead — AI meeting briefings & reports" },
       {
         property: "og:description",
         content:
-          "Ask questions across your work documents and auto-draft status reports, recaps and executive briefs.",
+          "Ask questions across your meeting notes and auto-draft status reports, recaps and executive briefs.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: Index,
 });
 
-const STORAGE_KEY = "workdesk.docs.v1";
+const STORAGE_KEY = "meetings-ahead.docs.v1";
 
 function Index() {
   const [docs, setDocs] = useState<WorkDoc[]>([]);
   const [selected, setSelected] = useState<string[]>([]);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [view, setView] = useState("brief");
+  const [navOpen, setNavOpen] = useState(false);
   const [turns, setTurns] = useState<ChatTurn[]>([]);
   const [insights, setInsights] = useState("");
   const [report, setReport] = useState("");

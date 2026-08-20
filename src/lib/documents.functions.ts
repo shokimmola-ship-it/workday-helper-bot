@@ -41,7 +41,7 @@ export const askDocuments = createServerFn({ method: "POST" })
     const result = streamText({
       model: gateway()(WORKDESK_MODEL),
       system:
-        "You are Workdesk, an analyst assistant. Answer strictly from the provided documents. " +
+        "You are Meetings Ahead, a meeting analyst assistant. Answer strictly from the provided documents. " +
         "Cite the document title in bold when you use it. If the answer is not in the documents, say so plainly and suggest what info is missing. " +
         "Use tight markdown: short paragraphs and bullets.",
       messages: [
@@ -59,7 +59,7 @@ export const generateReport = createServerFn({ method: "POST" })
     const result = streamText({
       model: gateway()(WORKDESK_MODEL),
       system:
-        "You are Workdesk, a workplace report writer. Produce a polished, ready-to-send markdown report " +
+        "You are Meetings Ahead, a workplace report writer. Produce a polished, ready-to-send markdown report " +
         "grounded only in the supplied documents. Never invent metrics. Include a title, a 3-bullet executive summary, " +
         "body sections, risks/blockers, and a table of next actions with owners where known.",
       prompt:

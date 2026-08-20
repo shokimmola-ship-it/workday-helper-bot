@@ -19,6 +19,10 @@
  */
 
 @theme inline {
+  --font-display: var(--font-display);
+  --font-sans: var(--font-body);
+  --color-surface-ink: var(--surface-ink);
+  --color-surface-ink-foreground: var(--surface-ink-foreground);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -62,26 +66,32 @@
 }
 
 :root {
-  --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.129 0.042 264.695);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.129 0.042 264.695);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.129 0.042 264.695);
-  --primary: oklch(0.208 0.042 265.755);
-  --primary-foreground: oklch(0.984 0.003 247.858);
-  --secondary: oklch(0.968 0.007 247.896);
-  --secondary-foreground: oklch(0.208 0.042 265.755);
-  --muted: oklch(0.968 0.007 247.896);
-  --muted-foreground: oklch(0.554 0.046 257.417);
-  --accent: oklch(0.968 0.007 247.896);
-  --accent-foreground: oklch(0.208 0.042 265.755);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.984 0.003 247.858);
-  --border: oklch(0.929 0.013 255.508);
-  --input: oklch(0.929 0.013 255.508);
-  --ring: oklch(0.704 0.04 256.788);
+  --radius: 0.75rem;
+  --background: oklch(0.982 0.006 95);
+  --foreground: oklch(0.24 0.025 255);
+  --card: oklch(1 0.002 95);
+  --card-foreground: oklch(0.24 0.025 255);
+  --popover: oklch(1 0.002 95);
+  --popover-foreground: oklch(0.24 0.025 255);
+  --primary: oklch(0.46 0.09 205);
+  --primary-foreground: oklch(0.985 0.005 95);
+  --secondary: oklch(0.945 0.012 95);
+  --secondary-foreground: oklch(0.3 0.03 255);
+  --muted: oklch(0.948 0.008 95);
+  --muted-foreground: oklch(0.52 0.02 250);
+  --accent: oklch(0.86 0.11 82);
+  --accent-foreground: oklch(0.26 0.04 60);
+  --destructive: oklch(0.55 0.19 28);
+  --destructive-foreground: oklch(0.985 0.005 95);
+  --border: oklch(0.9 0.012 95);
+  --input: oklch(0.9 0.012 95);
+  --ring: oklch(0.46 0.09 205);
+  --surface-ink: oklch(0.26 0.03 250);
+  --surface-ink-foreground: oklch(0.95 0.01 95);
+  --gradient-ink: linear-gradient(160deg, oklch(0.28 0.035 250), oklch(0.21 0.03 255));
+  --shadow-panel: 0 1px 2px oklch(0.24 0.025 255 / 0.06), 0 12px 32px oklch(0.24 0.025 255 / 0.07);
+  --font-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "DM Sans", ui-sans-serif, system-ui, sans-serif;
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
@@ -140,5 +150,90 @@
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
   }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+  }
+}
+
+@utility panel {
+  background-color: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-panel);
+}
+
+@utility ink-panel {
+  background-image: var(--gradient-ink);
+  color: var(--surface-ink-foreground);
+}
+
+.prose-workdesk {
+  font-size: 0.9375rem;
+  line-height: 1.65;
+  color: var(--color-foreground);
+}
+.prose-workdesk h1,
+.prose-workdesk h2,
+.prose-workdesk h3 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  margin: 1.25em 0 0.5em;
+  line-height: 1.25;
+}
+.prose-workdesk h1 {
+  font-size: 1.4rem;
+}
+.prose-workdesk h2 {
+  font-size: 1.15rem;
+}
+.prose-workdesk h3 {
+  font-size: 1rem;
+}
+.prose-workdesk p {
+  margin: 0.6em 0;
+}
+.prose-workdesk ul,
+.prose-workdesk ol {
+  margin: 0.6em 0;
+  padding-left: 1.2em;
+  list-style: disc;
+}
+.prose-workdesk ol {
+  list-style: decimal;
+}
+.prose-workdesk li {
+  margin: 0.25em 0;
+}
+.prose-workdesk strong {
+  font-weight: 600;
+}
+.prose-workdesk code {
+  background: var(--color-muted);
+  padding: 0.1em 0.35em;
+  border-radius: 0.35rem;
+  font-size: 0.85em;
+}
+.prose-workdesk table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0.9em 0;
+  font-size: 0.875rem;
+}
+.prose-workdesk th,
+.prose-workdesk td {
+  border: 1px solid var(--color-border);
+  padding: 0.45rem 0.6rem;
+  text-align: left;
+}
+.prose-workdesk th {
+  background: var(--color-muted);
+  font-weight: 600;
 }
